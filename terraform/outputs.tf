@@ -22,3 +22,8 @@ output "instance_public_ip" {
   description = "Public IP address of the Project 3 EC2 instance"
   value       = aws_instance.server.public_ip
 }
+
+output "elastic_ip" {
+  description = "Elastic IP address of the Project 3 EC2 instance"
+  value       = aws_eip.server.public_ip
+}
