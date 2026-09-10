@@ -1,0 +1,55 @@
+---
+- name: Configure and deploy Project 3 voting application
+  hosts: app_servers
+  become: true
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: true
+
+    - name: Install required packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    - name: Clone Project 3 repository
+      become_user: ubuntu
+      git:
+        repo: "https://github.com/Sachin001234/project-3-voting-devops.git"
+        dest: "/home/ubuntu/project-3-voting-devops"
+        version: main
+        update: true
+
+    - name: Make healthcheck scripts executable
+      file:
+        path: "/home/ubuntu/project-3-voting-devops/application/healthchecks"
+        mode: "0755"
+        recurse: true
+
+    - name: Start voting application
+      command:
+        cmd: docker compose up -d --build
+        chdir: "/home/ubuntu/project-3-voting-devops/application"
