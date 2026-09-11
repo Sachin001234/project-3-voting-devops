@@ -1,5 +1,5 @@
 from kubernetes import client, config
-
+import sys
 
 # Load Kubernetes configuration
 config.load_kube_config()
@@ -13,11 +13,11 @@ NAMESPACE = "project3"
 all_healthy = True
 
 
-# --------------------------------------------------
+# ============================================================
 # POD HEALTH CHECK
-# --------------------------------------------------
+# ============================================================
 
-print(f"\n========== POD HEALTH ==========")
+print("\n========== POD HEALTH ==========\n")
 print(f"Namespace: {NAMESPACE}\n")
 
 pods = v1.list_namespaced_pod(NAMESPACE)
@@ -34,7 +34,7 @@ for pod in pods.items:
             if condition.type == "Ready":
                 ready = condition.status == "True"
 
-    # Determine overall health
+    # Determine pod health
     if pod_phase == "Running" and ready:
         health = "HEALTHY"
     else:
@@ -48,29 +48,26 @@ for pod in pods.items:
     print("-" * 40)
 
 
-# --------------------------------------------------
+# ============================================================
 # DEPLOYMENT HEALTH CHECK
-# --------------------------------------------------
+# ============================================================
 
-print(f"\n========== DEPLOYMENT HEALTH ==========\n")
+print("\n========== DEPLOYMENT HEALTH ==========\n")
 
 deployments = apps_v1.list_namespaced_deployment(NAMESPACE)
 
 for deployment in deployments.items:
     deployment_name = deployment.metadata.name
 
-    desired = deployment.spec.replicas
-    available = deployment.status.available_replicas or 0
+    desired = deployment.spec.replicas or 0
     ready = deployment.status.ready_replicas or 0
+    available = deployment.status.available_replicas or 0
 
-    import sys
-
-    if all_healthy:
-        print("\nAll Kubernetes resources are healthy.")
-        sys.exit(0)
+    if ready == desired and available == desired:
+        health = "HEALTHY"
     else:
-        print("\nOne or more Kubernetes resources are unhealthy.")
-        sys.exit(1)
+        health = "UNHEALTHY"
+        all_healthy = False
 
     print(f"Deployment: {deployment_name}")
     print(f"Desired:    {desired}")
@@ -78,3 +75,15 @@ for deployment in deployments.items:
     print(f"Available:  {available}")
     print(f"Health:     {health}")
     print("-" * 40)
+
+
+# ============================================================
+# FINAL RESULT
+# ============================================================
+
+if all_healthy:
+    print("\nAll Kubernetes resources are healthy.")
+    sys.exit(0)
+else:
+    print("\nOne or more Kubernetes resources are unhealthy.")
+    sys.exit(1)
