@@ -88,15 +88,16 @@ body{
   text-transform: uppercase;
 }
 
-#choice .choice.dogs{
-  color: #00cbca;
-  float: right;
+#choice .choice_dogs{
+    color: #00cbca;
+    float: right;
 }
 
-#choice .choice.cats{
-  color: #2196f3;
-  float: left;
+#choice .choice_cats{
+    color: #2196f3;
+    float: left;
 }
+
 #background-stats{
   z-index:1;
   height:100%;

@@ -1,7 +1,11 @@
+# ============================================================
+# VOTE APPLICATION
+# ============================================================
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: result
+  name: vote-app
   namespace: project3
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -11,8 +15,123 @@ spec:
   rules:
     - http:
         paths:
+
+          # / and /vote/... -> vote service
+          - path: /()(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 80
+
+          - path: /vote(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 80
+
+
+---
+# ============================================================
+# VOTE STATIC FILES
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vote-static
+  namespace: project3
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 80
+
+
+---
+# ============================================================
+# RESULT APPLICATION
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: result-app
+  namespace: project3
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+
+          # /result/... -> /
           - path: /result(/|$)(.*)
             pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  number: 80
+
+
+---
+# ============================================================
+# RESULT STATIC FILES
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: result-static
+  namespace: project3
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+
+          # CSS
+          - path: /stylesheets
+            pathType: Prefix
+            backend:
+              service:
+                name: result
+                port:
+                  number: 80
+
+          # JavaScript
+          - path: /app.js
+            pathType: Exact
+            backend:
+              service:
+                name: result
+                port:
+                  number: 80
+
+          - path: /angular.min.js
+            pathType: Exact
+            backend:
+              service:
+                name: result
+                port:
+                  number: 80
+
+          # Socket.IO
+          - path: /socket.io.js
+            pathType: Exact
             backend:
               service:
                 name: result
