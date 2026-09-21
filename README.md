@@ -614,7 +614,7 @@ The project is designed so that infrastructure and application configuration can
 
 ## 🔄 Destroy & Rebuild
 
-Terraform is used to manage the AWS infrastructure as code, allowing the environment to be destroyed and recreated from the project configuration.
+Terraform was used to verify that the AWS infrastructure and deployment process can be recreated from code.
 
 ### Rebuild Workflow
 
@@ -637,23 +637,30 @@ AWS Infrastructure Recreated
 Ansible Configuration
         │
         ▼
-Application Deployment
+Docker Application Deployment
         │
         ▼
-Verification
+Application Verification
 ```
 
-### Rebuild Objective
+### Destroy & Rebuild Tasks Completed
 
-The goal of this phase is to verify that the infrastructure and deployment process are reproducible from code rather than depending on manually configured resources.
+- Destroyed the Terraform-managed AWS infrastructure
+- Verified that all Terraform resources were removed
+- Recreated the infrastructure using `terraform apply`
+- Recreated the EC2 server and Elastic IP
+- Verified SSH connectivity to the new server
+- Updated the Ansible inventory for the rebuilt server
+- Verified Ansible connectivity
+- Reconfigured the server using Ansible
+- Redeployed the Docker-based voting application
+- Verified all five application services
+- Verified the Vote application with HTTP 200
+- Verified the Result application with HTTP 200
 
-The rebuild process includes:
+### Rebuild Result
 
-- Destroying Terraform-managed infrastructure
-- Recreating the AWS infrastructure using Terraform
-- Reconfiguring the server using Ansible
-- Deploying the application
-- Verifying the application and infrastructure
+The complete environment was successfully destroyed and recreated from the project configuration, demonstrating that the infrastructure and deployment process can be reproduced without manually configuring the server from scratch.
 
 ## 🛠️ Troubleshooting & Debugging
 
