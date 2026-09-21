@@ -17,3 +17,9 @@ spec:
         - name: worker
           image: application-worker:latest
           imagePullPolicy: Never
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
